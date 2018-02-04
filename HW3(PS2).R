@@ -3,6 +3,7 @@
 # Gangyi Sun (441748)
 
 
+
 # QUESTION 1
 
 # The DigitDist function takes as input x, which is a matrix or vector of election returns.
@@ -57,8 +58,41 @@ StatD<-function(x){
   return(d)                 # returns d as the output of the function 
 }
 
+# The CalcBenfordLaw function is the answer to question 1. 
+# The CalcBenfordLaw function takes as input x, m and d. 
+# x is a matrix or vector of election returns.
+# m is a boolean. if m==true, the function will calculate and report the Leemis' m statistic.
+# d is a boolean. if d==true, the function will calculate and report the Cho-Gains' d statistic.
+# The function returns the full first-digit distribution of elector returns x, the m statistic if m==true,
+# and the d statistic if d==true. 
+CalcBenfordLaw<-function(x,m,d){
+  Lm<-NULL
+  Cd<-NULL
+  Dist<-DigitDist(x)        # obtains first-digit integer distribution of x 
+  if (m==TRUE){             # if m==true, calculate m statistic, save as Lm
+    m<-StatM(Dist)
+    Lm<-c(Lm,m)
+  } 
+  if (d==TRUE){
+    d<-StatD(Dist)
+    Cd<-c(Cd,d)             # if d==true, calculate d statistic, save as Cd
+  }
+  result<-list(Lm,Cd,Dist)
+  names(result)<-c("Leemis' m statistic","Cho-Gains' d statistic", "Full Digit Distribution")
+  return(result)            # returns the m statistic, d statistic and full digit distribution as a list
+}
+
+# Sample data used to check that the functions work. 
 x<-c(1234,125356,1,234,222,3,34567,4567,498,5555,5987,61234,671234,71,74,88,80,95,99999,9)
 xDist<-DigitDist(x)
+xDist
 StatM(xDist)
 StatD(xDist)
+CalcBenfordLaw(x,T,T)
+
+
+
+# QUESTION 2
+
+
 
