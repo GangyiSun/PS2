@@ -130,8 +130,8 @@ dSig<-function(d){
 # statistics' level of significance.
 print.benfords.1<-function(x){
   Dist<-DigitDist(x)     # obtains first-digit integer distribution of x 
-  m<-StatM(Dist)
-  d<-StatD(Dist)
+  m<-round(StatM(Dist),4)
+  d<-round(StatD(Dist),4)
   mSigValue<-mSig(m)
   dSigValue<-dSig(d)
   
@@ -141,10 +141,22 @@ print.benfords.1<-function(x){
   rownames(table)<-c("Leemis' m statistic","Cho-Gains' d statistic")
   colnames(table)<-'Value'
   return(table)
+  
+  # ADD THIS 
+  # *** p<0.01, ** p<0.05, * p<0.1
+}
+
+# The print.benfords.2 function is the answer to part 2 of question 2. 
+# The print.benfords.1 function takes as input x, which is a matrix or vector of election returns.
+# The function returns ______ ADD TO THIS
+print.benfords.2<-function(x){
+  x<-as.data.frame(x)
+  print(x)
+  sink("~/Documents/WashU - School Work/R Working Folder/New3.csv")
 }
 
 # Sample data used to check that the functions work. 
 x<-c(rep(9,2000),1,2,3,4,5,6,7,8)
 print.benfords.1(x)
-# *** p<0.01, ** p<0.05, * p<0.1
+print.benfords.2(x)
 
