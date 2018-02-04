@@ -35,7 +35,7 @@ DigitDist<-function(x){
 # The StatM function takes as input x, which is a matrix of first significant digit integer 
 # frequencies (output from DigistDist).
 # The function returns the Leemis' m statistic.  
-StatM<-function(x){
+StatM<-function(IntCount){
   Mi<-NA
   for (i in 1:9){           # evaluates Xi-log10(1+1/i) for each integer i, stored in vector Mi
     Xi<-IntCount[i]/sum(IntCount)     # Xi is the proportional frequency of integer i observed in x 
@@ -48,7 +48,7 @@ StatM<-function(x){
 # The StatD function takes as input x, which is a matrix of first significant digit integer 
 # frequencies (output from DigistDist).
 # The function returns the Cho-Gains' d statistic.  
-StatD<-function(x){
+StatD<-function(IntCount){
   Di<-NA
   for (i in 1:9){           # evaluates (Xi-log10(1+1/i))^2 for each integer i, stored in vector Mi
     Xi<-IntCount[i]/sum(IntCount)     # Xi is the proportional frequency of integer i observed in x 
@@ -94,5 +94,57 @@ CalcBenfordLaw(x,T,T)
 
 # QUESTION 2
 
+# The function mSig takes as input m, which is the Leemis' m stastic.
+# The function returns characters containing *s that indicate the level of significance of the m statistic.
+mSig<-function(m){
+  mSig<-NULL
+  if (m>0.851 & m<=0.967){    # rules to determine the level of significance of the m statistic
+    mSig<-'*'
+  }else if (m>0.967 & m<=1.212){
+    mSig<-'**'
+  }else if (m>1.212){
+    mSig<-'***'
+  }
+  return(mSig)                # returns the level of significance of the m statistic, indicated by *s
+                              # returns an empty string if p-value greater than 0.10. 
+}
 
+# The function dSig takes as input d, which is the Cho-Gains' d stastic.
+# The function returns characters containing *s that indicate the level of significance of the d statistic.
+dSig<-function(d){
+  dSig<-NULL
+  if (d>1.212 & d<=1.330){    # rules to determine the level of significance of the d statistic
+    dSig<-'*'
+  }else if (d>1.330 & d<=1.569){
+    dSig<-'**'
+  }else if (d>1.569){
+    dSig<-'***'
+  }
+  return(dSig)                # returns the level of significance of the d statistic, indicated by *s
+                              # returns an empty string if p-value greater than 0.10. 
+}
+
+# The print.benfords.1 function is the answer to part 1 of question 2. 
+# The print.benfords.1 function takes as input x, which is a matrix or vector of election returns.
+# The function returns a table containing the values of the m and d statistic and information regarding each 
+# statistics' level of significance.
+print.benfords.1<-function(x){
+  Dist<-DigitDist(x)     # obtains first-digit integer distribution of x 
+  m<-StatM(Dist)
+  d<-StatD(Dist)
+  mSigValue<-mSig(m)
+  dSigValue<-dSig(d)
+  
+  mFinal<-paste(m,mSigValue,sep="")
+  dFinal<-paste(d,dSigValue,sep="")
+  table<-as.data.frame(c(mFinal,dFinal))
+  rownames(table)<-c("Leemis' m statistic","Cho-Gains' d statistic")
+  colnames(table)<-'Value'
+  return(table)
+}
+
+# Sample data used to check that the functions work. 
+x<-c(rep(9,2000),1,2,3,4,5,6,7,8)
+print.benfords.1(x)
+# *** p<0.01, ** p<0.05, * p<0.1
 
