@@ -124,39 +124,42 @@ dSig<-function(d){
                               # returns an empty string if p-value greater than 0.10. 
 }
 
-# The print.benfords.1 function is the answer to part 1 of question 2. 
-# The print.benfords.1 function takes as input x, which is a matrix or vector of election returns.
-# The function returns a table containing the values of the m and d statistic and information regarding each 
+# The print.benfords function is the answer to part 1 of qestion 2. 
+# The print.benfords function takes as input x, which is a matrix or vector of election returns.
+# The function prints a table containing the values of the m and d statistic and information regarding each 
 # statistics' level of significance.
-print.benfords.1<-function(x){
-  Dist<-DigitDist(x)     # obtains first-digit integer distribution of x 
-  m<-round(StatM(Dist),4)
-  d<-round(StatD(Dist),4)
-  mSigValue<-mSig(m)
-  dSigValue<-dSig(d)
+print.benfords<-function(x){
+  Dist<-DigitDist(x)          # obtains first-digit integer distribution of x 
+  m<-round(StatM(Dist),4)     # obtains the Leemis' m statistic, rounded to 4 d.p.
+  d<-round(StatD(Dist),4)     # obtains the Cho-Gains' d statistic, rounded to 4 d.p.
+  mSigValue<-mSig(m)          # obtains the level of significance of the m statistic
+  dSigValue<-dSig(d)          # obtains the level of significance of the d statistic
+  mFinal<-paste(m,mSigValue,sep="")     # combines m statistic and its level of significance as a character
+  dFinal<-paste(d,dSigValue,sep="")     # combines d statistic and its level of significance as a character
   
-  mFinal<-paste(m,mSigValue,sep="")
-  dFinal<-paste(d,dSigValue,sep="")
-  table<-as.data.frame(c(mFinal,dFinal))
-  rownames(table)<-c("Leemis' m statistic","Cho-Gains' d statistic")
-  colnames(table)<-'Value'
-  return(table)
-  
-  # ADD THIS 
-  # *** p<0.01, ** p<0.05, * p<0.1
+  table<-as.data.frame(c(mFinal,dFinal))    # creates a dataframe containing the m and d statistics, and 
+                                            # their level of significance
+  rownames(table)<-c("Leemis' m statistic,","Cho-Gains' d statistic,")     
+  colnames(table)<-',Value'                 # labels the table, the commas are used to split information 
+                                            # into columns in the csv output
+  print(table)                              # prints the table required containing m and d statistics 
+  cat("*** p<0.01; ** p<0.05; * p<0.1")     # prints the legend required explaning the asterisk's 
 }
 
-# The print.benfords.2 function is the answer to part 2 of question 2. 
-# The print.benfords.1 function takes as input x, which is a matrix or vector of election returns.
-# The function returns ______ ADD TO THIS
-print.benfords.2<-function(x){
-  x<-as.data.frame(x)
-  print(x)
-  sink("~/Documents/WashU - School Work/R Working Folder/New3.csv")
+# The output.benfords function is the answer to qestion 2. 
+# The output.benfords function takes as input x and directory.
+# x is a matrix or vector of election returns.
+# directory is a string indicating the location of a folder on a computer.
+# The function creates a csv file in the folder indicated by directory. The csv file contains the values of the 
+# m and d statistic and information regarding each statistics' level of significance.
+output.benfords<-function(x,directory){
+  sink(directory)           # creates csv file in directory indicated
+  print.benfords(x)         # prints the required table and caption in the csv file
+  sink()                    
 }
 
 # Sample data used to check that the functions work. 
 x<-c(rep(9,2000),1,2,3,4,5,6,7,8)
-print.benfords.1(x)
-print.benfords.2(x)
+print.benfords(x)
+output.benfords(x,"~/Documents/GitHub/PS2/Table.csv")
 
