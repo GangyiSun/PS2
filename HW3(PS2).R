@@ -11,15 +11,15 @@
 # all elements of x (the full digit distribution). 
 DigitDist<-function(x){
   x<-as.character(x)        # re-casts numeric vector/matrix x as a character matrix
-  x<-strsplit(x,"")         # splits each number in x into a sub-string
+  x<-strsplit(x,"")         # splits each observation in x into sub-strings, each sub-string containing 1 integer
   y<-NULL
-  for (i in 1:length(x)){   # obtains the integer in the first significant digit of each element of x 
+  for (i in 1:length(x)){   # obtains the integer in the first significant digit of each observation in x 
     y[i]<-x[[i]][1]
   }
   y<-as.numeric(y)          # re-casts the characters into numerics 
-  IntCount<-matrix(0,nrow=9,ncol=1)   # crates a matrix IntCount, which will contain the integer frequency information 
-  rownames(IntCount)<-seq(1:9)
-  colnames(IntCount)<-'Frequency'
+  IntCount<-matrix(0,nrow=9,ncol=1)   # creates a matrix IntCount, which will contain the integer frequency information 
+  rownames(IntCount)<-seq(1:9)        
+  colnames(IntCount)<-'Frequency'     # label rows and column of IntCount
   for (i in 1:9){           # obtains integer frequencies in y 
     count<-0
     for (n in 1:length(y)){
@@ -33,11 +33,11 @@ DigitDist<-function(x){
 }
 
 # The StatM function takes as input x, which is a matrix of first significant digit integer 
-# frequencies (output from DigistDist).
+# frequencies (output from DigitDist).
 # The function returns the Leemis' m statistic.  
 StatM<-function(IntCount){
   Mi<-NA
-  for (i in 1:9){           # evaluates Xi-log10(1+1/i) for each integer i, stored in vector Mi
+  for (i in 1:9){           # evaluates Xi-log10(1+1/i) for each integer i, results stored in vector Mi
     Xi<-IntCount[i]/sum(IntCount)     # Xi is the proportional frequency of integer i observed in x 
     Mi[i]<-Xi-log10(1+1/i)
   }
@@ -54,7 +54,7 @@ StatD<-function(IntCount){
     Xi<-IntCount[i]/sum(IntCount)     # Xi is the proportional frequency of integer i observed in x 
     Di[i]<-(Xi-log10(1+1/i))^2
   }
-  d<-sqrt(sum(Di))          # the Cho-Gains' d statistic is the sum of all values contained in vector Di
+  d<-sqrt(sum(Di))          # the Cho-Gains' d statistic is the square root of the sum of values contained in vector Di
   return(d)                 # returns d as the output of the function 
 }
 
@@ -70,12 +70,10 @@ CalcBenfordLaw<-function(x,m,d){
   Cd<-NULL
   Dist<-DigitDist(x)        # obtains first-digit integer distribution of x 
   if (m==TRUE){             # if m==true, calculate m statistic, save as Lm
-    m<-StatM(Dist)
-    Lm<-c(Lm,m)
+    Lm<-c(Lm,StatM(Dist))
   } 
-  if (d==TRUE){
-    d<-StatD(Dist)
-    Cd<-c(Cd,d)             # if d==true, calculate d statistic, save as Cd
+  if (d==TRUE){             # if d==true, calculate d statistic, save as Cd
+    Cd<-c(Cd,StatD(Dist))             
   }
   result<-list(Lm,Cd,Dist)
   names(result)<-c("Leemis' m statistic","Cho-Gains' d statistic", "Full Digit Distribution")
@@ -83,7 +81,7 @@ CalcBenfordLaw<-function(x,m,d){
 }
 
 # Sample data used to check that the functions work. 
-x<-c(1234,125356,1,234,222,3,34567,4567,498,5555,5987,61234,671234,71,74,88,80,95,99999,9)
+x<-c(1234,125356,1,653,234,56,56,245,234,45,768,9706,234,222,3,34567,4567,498,5555,5987,61234,671234,71,74,88,80,95,99,9)
 xDist<-DigitDist(x)
 xDist
 StatM(xDist)
@@ -98,11 +96,11 @@ CalcBenfordLaw(x,T,T)
 # The function returns characters containing *s that indicate the level of significance of the m statistic.
 mSig<-function(m){
   mSig<-NULL
-  if (m>0.851 & m<=0.967){    # rules to determine the level of significance of the m statistic
+  if (m>=0.851 & m<0.967){    # rules to determine the level of significance of the m statistic
     mSig<-'*'
-  }else if (m>0.967 & m<=1.212){
+  }else if (m>=0.967 & m<1.212){
     mSig<-'**'
-  }else if (m>1.212){
+  }else if (m>=1.212){
     mSig<-'***'
   }
   return(mSig)                # returns the level of significance of the m statistic, indicated by *s
@@ -113,11 +111,11 @@ mSig<-function(m){
 # The function returns characters containing *s that indicate the level of significance of the d statistic.
 dSig<-function(d){
   dSig<-NULL
-  if (d>1.212 & d<=1.330){    # rules to determine the level of significance of the d statistic
+  if (d>=1.212 & d<1.330){    # rules to determine the level of significance of the d statistic
     dSig<-'*'
-  }else if (d>1.330 & d<=1.569){
+  }else if (d>=1.330 & d<1.569){
     dSig<-'**'
-  }else if (d>1.569){
+  }else if (d>=1.569){
     dSig<-'***'
   }
   return(dSig)                # returns the level of significance of the d statistic, indicated by *s
@@ -140,13 +138,13 @@ print.benfords<-function(x){
   table<-as.data.frame(c(mFinal,dFinal))    # creates a dataframe containing the m and d statistics, and 
                                             # their level of significance
   rownames(table)<-c("Leemis' m statistic,","Cho-Gains' d statistic,")     
-  colnames(table)<-',Value'                 # labels the table, the commas are used to split information 
-                                            # into columns in the csv output
+  colnames(table)<-',Value'                 # labels the table. the commas are used to split information 
+                                            # into columns in the csv output later
   print(table)                              # prints the table required containing m and d statistics 
-  cat("*** p<0.01; ** p<0.05; * p<0.1")     # prints the legend required explaning the asterisk's 
+  cat("*** p<0.01; ** p<0.05; * p<0.1")     # prints the legend required explaning the asterisks 
 }
 
-# The output.benfords function is the answer to qestion 2. 
+# The output.benfords function is the answer to part 2 of qestion 2. 
 # The output.benfords function takes as input x and directory.
 # x is a matrix or vector of election returns.
 # directory is a string indicating the location of a folder on a computer.
